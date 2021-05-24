@@ -3,7 +3,7 @@ uniapp
 
 本插件适用方便提示请求的信息，使用起来方便，可以后期二期开发
 
-这是一个项目下载地址链接 [github](https://github.com/lizhizhong/popView)
+这是一个项目下载地址链接 [github](https://github.com/lizhizhong/scrollView)
 
 # 兼容说明
 适合所有前端组件
@@ -11,12 +11,59 @@ uniapp
 
 # 导入
 ```
-import popview4 from '@/components/pop-view/pop-view4.vue'
+import ourLoading from '@/components/our-loading/our-loading.vue'
+import selfRoll from '@/components/self-roll/roll.vue'
+import nodata from '@/components/no-data/bottom.vue';
+import noview from '@/components/no-data/back-view.vue';
+import scrollView from '@/components/scroll-view/scroll-view.vue';
 ```
+# 组件说明
+ourLoading  数据加载loding
+selfRoll    滑动超出屏幕出现的回到顶部的按钮
+nodata      数据加载完成显示的底部视图 
+noview      没有数据的时候显示视图
+scrollView  数据载体滑动组件
 
+# 参数说明
+## ourLoading参数说明
+| 参数 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
+## selfRoll参数说明
+| 参数 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
+## nodata参数说明
+| 参数 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
+## noview参数说明
+| 参数 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
+## scrollView参数说明
+| 参数 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
 
 # 方法说明
-
+##  selfRoll方法说明
+| 方法 | 名  | 说明 |
+| :-----| ----: | :----: |
+| success(content) | 成功 | content参数成功提示信息 |
+| error(content) | 失败 |  content参数失败提示信息 |
+| warn(content) | 警告 |  content参数警告提示信息 |
+##  scrollView方法说明
 | 方法 | 名  | 说明 |
 | :-----| ----: | :----: |
 | success(content) | 成功 | content参数成功提示信息 |
@@ -26,68 +73,597 @@ import popview4 from '@/components/pop-view/pop-view4.vue'
 # 使用案例
 ```
 <template>
-	<view class="content">
-		<text class="success" @click="success">成功</text>
-		<text class="error" @click="error">失败</text>
-		<text class="warn" @click="warn">警告</text>
-		<popview4 ref="popview4"></popview4>
+	<view id="parentId" style="width: 100%;">
+		<view class="content">
+			<view class="topView search">
+				<view class="topView">
+					<view class="leftView">
+						<text>名师课堂</text>
+					</view>
+					<view class="rightView">
+
+					</view>
+					<view class="allGroup">
+						<view id="groups" class="item">
+							<text>全部分组</text>
+						</view>
+					</view>
+				</view>
+				<view class="bottomView">
+					<view id="filetype" class="leftView">
+						<text>视频</text>
+					</view>
+					<view class="rightView">
+						<text>共100个内容</text>
+					</view>
+				</view>
+			</view>
+			<view class="bottomView">
+				<scrollView height1="calc(100vh - 220upx - 90upx)" :isReloadComplete1="isReloadComplete"
+					:isShowNodata1="isReloadComplete&&!isNoData" @downdata="downdata" @updata="updata"
+					@onScroll="onScroll">
+					<view class="content1" v-for="(item,index) in dataList" :key="index">
+						<view class="item" @click="liveBtn(item)">
+							<view class="content2" :style="{height:height+'upx'}">
+								<view class="left">
+									<view class="type">
+										<text>类型</text>
+									</view>
+								</view>
+								<view class="right">
+									<view class="top"><text>{{item.title}}</text></view>
+									<view class="center"><text>{{item.livedate}}</text></view>
+									<view class="bottom"><text class="lf">{{item.price}}</text><text
+											class="rh">{{item.liveStatus}}</text></view>
+								</view>
+							</view>
+						</view>
+					</view>
+					<noview v-show="isNoData"></noview>
+				</scrollView>
+			</view>
+		</view>
+		<selfRoll :active="roll" :left="right" @scrollTo="scrollTo"></selfRoll>
+		<ourLoading isFullScreen :active="active" text="loading..." color="#13b6ff" textColor="#13b6ff" />
 	</view>
 </template>
 
 <script>
-	import popview4 from '@/components/pop-view/pop-view4.vue'
+	import noview from '../../components/no-data/back-view.vue';
 	export default {
 		components: {
-		    popview4
-		  },
+			noview
+		},
 		data() {
 			return {
-				title: 'Hello'
+				active: true,
+				isReloadComplete: false,
+				isNoData: true,
+				page: 0,
+				dataList: [{
+						"Id": "21",
+						"title": "抖音语文",
+						"thum": "/upload/article/20210311175044.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "100.00",
+						"videotype": 1
+					},
+					{
+						"Id": "20",
+						"title": "知识海洋",
+						"thum": "/upload/article/20210311164809.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "100.00",
+						"videotype": 1
+					},
+					{
+						"Id": "19",
+						"title": "思维导图",
+						"thum": "/upload/article/20210311163406.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "200.00",
+						"videotype": 1
+					},
+					{
+						"Id": "18",
+						"title": "国学经典·精品课",
+						"thum": "/upload/article/20210311163237.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "200.00",
+						"videotype": 1
+					},
+					{
+						"Id": "21",
+						"title": "抖音语文",
+						"thum": "/upload/article/20210311175044.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "100.00",
+						"videotype": 1
+					},
+					{
+						"Id": "20",
+						"title": "知识海洋",
+						"thum": "/upload/article/20210311164809.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "100.00",
+						"videotype": 1
+					},
+					{
+						"Id": "19",
+						"title": "思维导图",
+						"thum": "/upload/article/20210311163406.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "200.00",
+						"videotype": 1
+					},
+					{
+						"Id": "18",
+						"title": "国学经典·精品课",
+						"thum": "/upload/article/20210311163237.jpg",
+						"viptype": "{\"type\":\"1\",\"discount\":\"0.00\"}",
+						"sviptype": "{\"type\":\"0\",\"discount\":\"0.00\"}",
+						"livedate": null,
+						"price": "200.00",
+						"videotype": 1
+					}
+				],
+				height: 180,
+				systemHeight: 0, //系统的高度
+				roll: false, //返回顶部
+				right: '0upx', //右侧距离
+				scrollTop: 0, //设置滚动的距离
 			}
 		},
-		onLoad() {
+		onReady() { //页面初次渲染完毕执行
+			this.getInfo();
+		},
+		onLoad(paramater) {
+			this.systemHeight = this.getSystemMsg('windowHeight');
 
+			this.get_group_atricle_list();
 		},
 		methods: {
-			success(){
-				this.$refs['popview4'].success('成功');
+			getInfo() {
+				this.right = this.getViewWidth('.search');
 			},
-			error(){
-				this.$refs['popview4'].error('失败');
+			/*获取分组文章列表*/
+			get_group_atricle_list() {
+				this.page = 0;
+				++this.page;
+				setTimeout(() => {
+					this.isNoData = false;
+					this.dataList = this.dataList;
+					this.active = false;
+				}, 2000);
+
 			},
-			warn(){
-				this.$refs['popview4'].warn('警告');
-			}
+			/*下拉刷新*/
+			downdata() {
+				/* console.log('下拉刷新'); */
+				this.isNoData = true;
+				this.page = 0;
+				++this.page;
+
+				/*
+				这里面数据请求完成调用
+				uni.$emit('downdataHD',{type:'down'});
+				*/
+
+				setTimeout(() => {
+					this.isNoData = false;
+					this.dataList = this.dataList;
+					uni.$emit('downdataHD', {
+						type: 'down'
+					});
+				}, 2000);
+
+			},
+			/*上拉加载*/
+			updata() {
+				/* console.log('上拉加载'); */
+				/*
+				这里面数据请求完成调用
+				uni.$emit('updataHD',{type:'up'});
+				*/
+				++this.page;
+
+				setTimeout(() => {
+					if (this.page == 3) {
+						this.isReloadComplete = true;
+						this.isNoData = false;
+					}
+					this.dataList = this.dataList.concat(this.dataList);
+					uni.$emit('updataHD', {
+						type: 'up'
+					});
+				}, 2000);
+
+
+			},
+			//scrollview滚动
+			onScroll(e) { //nvue暂不支持滚动监听，可用bindingx代替
+				/* console.log("滚动距离为：" + e.scrollTop);
+				console.log(this.getSystemMsg('windowHeight')); */
+				if (e.scrollTop > this.systemHeight) {
+					this.roll = true;
+				} else {
+					this.roll = false;
+				}
+			},
+			/*scrollview返回远点*/
+			scrollTo() {
+				uni.$emit('goTop', '');
+			},
+			//获取系统参数
+			getSystemMsg: function(key) {
+				var result = '';
+				uni.getSystemInfo({
+					success: (res) => {
+						console.log(res);
+						if (key === 'windowHeight') {
+							result = res.windowHeight;
+						}
+					}
+				});
+				return result;
+			},
+			//获取页面宽度
+			getViewWidth: function(className) {
+				// 注意：想要拿到元素实例，需要在实例已经挂载到页面上才可以
+				var right = 0;
+				const query = uni.createSelectorQuery().in(this);
+				query.select(className).boundingClientRect(data => {
+					right = (data.right) * 375 / data.width + 240 + 'upx';
+
+				}).exec();
+				// console.log(right);
+				return right;
+			},
+
 		}
 	}
 </script>
 
-<style>
+<style lang="scss">
+	uni-page-body>uni-view:first-child {
+		padding-bottom: 0px !important; //不然底部会空出来
+	}
+
+	page {
+		position: relative;
+		background-color: $uni-bg-color;
+		overflow: hidden;
+
+	}
+
 	.content {
+		width: auto;
+		margin: 90upx 15upx 0 15upx;
+		box-sizing: border-box;
+		// overflow: hidden;
 		display: flex;
 		flex-direction: column;
+
+		// background-color: red;
+	}
+
+	.content>.topView {
+		width: 100%;
+		height: 220upx;
+		// overflow: hidden;
+		// background-color: red;
+		display: flex;
+		flex-direction: column;
+
+	}
+
+	.content>.topView>.topView {
+		height: 60%;
+		width: 100%;
+		// background-color: blue;
+		border-bottom: 1upx #f2f2f2 solid;
+		position: relative;
+	}
+
+	.content>.topView>.topView>.leftView {
+		width: 70%;
+		height: 100%;
+		// background-color: green;
+		display: flex;
+		align-items: center;
+	}
+
+	.content>.topView>.topView>.leftView>text {
+		width: 100%;
+		font-size: 38upx;
+		font-weight: bold;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.content>.topView>.topView>.allGroup {
+		width: 210upx;
+		height: 100%;
+		position: absolute;
+		right: -20upx;
+		top: 0;
+
+		display: flex;
 		align-items: center;
 		justify-content: center;
 	}
 
-	text {
-		font-size: 36rpx;
-		margin-top: 20upx;
+	.content>.topView>.topView>.allGroup>.item {
+		width: 100%;
+		height: calc(220upx * 0.55 * 0.6);
+		background-color: #13b6ff;
+		border-top-left-radius: calc(220upx * 0.55 * 0.6);
+		border-bottom-left-radius: calc(220upx * 0.55 * 0.6);
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.content>.topView>.topView>.allGroup>.item>text {
 		font-size: 30upx;
-		color: #fff;
-		padding: 15upx 20upx;
+		color: $uni-bg-color;
 	}
-	.content .success{
-		background-color: #1afa29;
+
+	.content>.topView>.topView>.allGroup>.item>text span {
+		font-size: 28upx;
+		margin-left: 10upx;
 	}
-	.content .error{
-		background-color: #d81e06;
+
+	.content>.topView>.bottomView {
+		height: 45%;
+		width: 100%;
+		// background-color: green;
+		border-bottom: 1upx #f2f2f2 solid;
+		display: flex;
 	}
-	.content .warn{
-		background-color: #f4ea2a;
+
+	.content>.topView>.bottomView>.leftView {
+		max-width: 60%;
+		height: 100%;
+		display: flex;
+		align-items: center;
 	}
-	
+
+	.content>.topView>.bottomView>.leftView>text {
+		font-size: 34upx;
+		color: $uni-text-color;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.content>.topView>.bottomView>.leftView>text span {
+		font-size: 30upx;
+		margin-left: 12upx;
+	}
+
+	.content>.topView>.bottomView>.rightView {
+		flex: 1;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+		overflow: hidden;
+
+	}
+
+	.content>.topView>.bottomView>.rightView>text {
+		font-size: 33upx;
+		color: $uni-text-color-grey;
+		font-weight: bold;
+		overflow: hidden;
+		white-space: nowrap;
+		text-overflow: ellipsis;
+	}
+
+	.content>.bottomView {
+		width: 100%;
+		box-sizing: border-box;
+		position: relative;
+		// background-color: red;
+	}
+
+	.content>.bottomView .content1 {
+		width: 100%;
+
+		display: flex;
+		flex-wrap: wrap;
+
+		box-sizing: border-box;
+
+		// background-color: red;
+	}
+
+	.content>.bottomView .content1>.item {
+
+		width: 100%;
+		height: 220upx;
+
+		display: flex;
+		flex-wrap: wrap;
+
+		box-sizing: border-box;
+
+		background-color: $uni-bg-color;
+
+		border-bottom: 1upx #f2f2f2 solid;
+	}
+
+	.content>.bottomView .content1>.item>.content2 {
+		width: 100%;
+		margin: 20upx 0;
+		// background-color: red;
+		display: flex;
+		box-sizing: border-box;
+
+		// overflow: hidden;
+		white-space: nowrap;
+
+	}
+
+	.content>.bottomView .content1>.item>.content2>.left {
+		width: 250upx;
+		height: 100%;
+
+		position: relative;
+
+		// background-color: yellow;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.left>.picture {
+		width: 100%;
+		height: 100%;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.left>.icon {
+		width: 50px;
+		height: 50px;
+
+		position: absolute;
+		z-index: 3;
+		top: 0;
+		left: 0;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.left>.type {
+		position: absolute;
+		z-index: 3;
+		width: 90upx;
+		height: 40upx;
+		right: 0;
+		top: 20upx;
+		background-color: rgba($color: #000000, $alpha: 0.3);
+
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		border-top-left-radius: 20upx;
+		border-bottom-left-radius: 20upx;
+
+	}
+
+	.content>.bottomView .content1>.item>.content2>.left>.type>text {
+		font-size: 26upx;
+		color: $uni-bg-color;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right {
+
+		height: 100%;
+
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+
+		box-sizing: border-box;
+		flex: 1;
+
+
+		margin-left: 20upx;
+
+		// background-color: blue;
+
+
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.top {
+		width: 100%;
+		height: 50%;
+		display: flex;
+		white-space: nowrap;
+
+		// background-color: yellow;
+
+		box-sizing: border-box;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.top>text {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		box-sizing: border-box;
+
+		font-size: 34upx;
+
+		color: $uni-text-color;
+
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.center {
+		width: 100%;
+		height: 25%;
+
+		display: flex;
+		white-space: nowrap;
+
+		// background-color: yellow;
+
+		box-sizing: border-box;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.center>text {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		box-sizing: border-box;
+
+		width: 100%;
+
+		font-size: 28upx;
+
+		color: $uni-text-color-grey;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.bottom {
+		width: 100%;
+		height: 25%;
+
+		// background-color: yellow;
+
+		display: flex;
+		align-items: flex-end;
+
+		margin: 0;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.bottom>.lf {
+		flex: 1;
+
+		font-size: 34upx;
+
+		color: #f74163;
+	}
+
+	.content>.bottomView .content1>.item>.content2>.right>.bottom>.rh {
+		font-size: 28upx;
+		display: none;
+	}
 </style>
+
 
 ```
 
